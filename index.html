@@ -47,6 +47,7 @@
       position: sticky; 
       top: 10px; 
       z-index: 1000;
+      will-change: transform;
     }
 
     #timer-container {
@@ -103,4 +104,193 @@
       <h2 id="quiz-header">LUYỆN TRẮC NGHIỆM A0</h2>
       <div id="result" class="alert text-center py-4" style="display:none;"></div>
       
-      <div id="quiz-content">Đang tải câu
+      <div id="quiz-content">Đang tải câu hỏi...</div>
+
+      <div id="pagination-controls" class="pagination-btns" style="display:none;">
+        <button id="prev-btn" class="btn btn-outline-primary" onclick="changePage(-1)">QUAY LẠI</button>
+        <button id="next-btn" class="btn btn-primary" onclick="changePage(1)">TIẾP THEO</button>
+      </div>
+
+      <button id="submit-btn-bottom" onclick="checkAnswers()">NỘP BÀI</button>
+
+      <div id="after-submit-controls" class="mt-4" style="display:none;">
+        <button class="btn btn-info w-100 text-white fw-bold py-3 mb-2" onclick="reviewAllQuestions()">XEM LẠI TOÀN BỘ CÂU HỎI & TRẢ LỜI</button>
+        <button class="btn btn-secondary w-100 py-3" onclick="restartQuiz()">LÀM ĐỀ KHÁC</button>
+      </div>
+    </div>
+
+    <div id="side-nav" class="nav-panel" style="display:none;">
+      <div id="timer-container"><div id="timer">60:00</div></div>
+      <div class="nav-grid" id="nav-grid"></div>
+      <button id="submit-btn-sidebar" onclick="checkAnswers()">NỘP BÀI</button>
+    </div>
+  </div>
+
+<script>
+  /* --- CẤU HÌNH KẾT NỐI --- */
+  // Link của bạn đã được dán sẵn ở đây
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyss3IaXbrbqw1yUD-_VRF77YgidAQJ31UPYmDcyULZQg-9ro8vZh3i3X-vsesn1T9A/exec?type=data";
+
+  let allQuestions = [];
+  let userAnswers = {};
+  let currentPage = 0;
+  const questionsPerPage = 10;
+  let timeLeft, timerId = null;
+
+  window.onload = loadNewQuiz;
+
+  function loadNewQuiz() {
+    document.getElementById('quiz-content').innerHTML = "<div class='text-center p-5'>Đang kết nối dữ liệu từ máy chủ...</div>";
+    document.getElementById('side-nav').style.display = "none";
+    document.getElementById('pagination-controls').style.display = "none";
+    document.getElementById('after-submit-controls').style.display = "none";
+    document.getElementById('result').style.display = "none";
+    document.getElementById('submit-btn-bottom').style.display = "none";
+    if(timerId) clearInterval(timerId);
+
+    // Sử dụng Fetch để lấy dữ liệu từ Google Script
+    fetch(SCRIPT_URL)
+      .then(response => {
+        if (!response.ok) throw new Error("Mạng lỗi hoặc link Script không phản hồi");
+        return response.json();
+      })
+      .then(data => {
+        if (data && data.length > 0) {
+          setupQuiz(data);
+        } else {
+          throw new Error("Không nhận được dữ liệu câu hỏi từ Sheet");
+        }
+      })
+      .catch(error => {
+        document.getElementById('quiz-content').innerHTML = 
+          `<div class='alert alert-danger'>Lỗi kết nối: ${error.message}.<br><br><b>Cách sửa:</b> Hãy đảm bảo bạn đã "Deploy" (Triển khai) Web App ở chế độ "Anyone" (Bất kỳ ai).</div>`;
+      });
+  }
+
+  function setupQuiz(data) {
+    allQuestions = data;
+    userAnswers = {};
+    currentPage = 0;
+    renderNav();
+    renderPage();
+    startTimer(60);
+    document.getElementById('side-nav').style.display = "block";
+    document.getElementById('pagination-controls').style.display = "flex";
+  }
+
+  function renderNav() {
+    let navHtml = "";
+    allQuestions.forEach((_, i) => {
+      navHtml += `<div id="nav-item-${i}" class="nav-box" onclick="goToQuestion(${i})">${i + 1}</div>`;
+    });
+    document.getElementById('nav-grid').innerHTML = navHtml;
+  }
+
+  function renderPage() {
+    let start = currentPage * questionsPerPage;
+    let end = Math.min(start + questionsPerPage, allQuestions.length);
+    let html = `<div class="text-center mb-3 text-muted small">Câu ${start + 1} - ${end} / ${allQuestions.length}</div>`;
+
+    for (let i = start; i < end; i++) {
+      let q = allQuestions[i];
+      let options = [q[1], q[2], q[3], q[4]].filter(o => o && o !== "");
+      html += `<div class="question-block">
+                <div class="question-title">${i + 1}. ${q[0]}</div>`;
+      options.forEach((opt, optIdx) => {
+        let isChecked = userAnswers[i] === opt ? "checked" : "";
+        html += `<div class="form-check">
+                  <input class="form-check-input" type="radio" name="q${i}" id="q${i}_${optIdx}" value="${opt}" ${isChecked} onchange="saveAnswer(${i}, '${opt}')">
+                  <label class="form-check-label" for="q${i}_${optIdx}">${opt}</label>
+                </div>`;
+      });
+      html += `</div>`;
+    }
+    document.getElementById('quiz-content').innerHTML = html;
+    
+    let isLastPage = (end === allQuestions.length);
+    document.getElementById('prev-btn').disabled = (currentPage === 0);
+    document.getElementById('next-btn').style.display = isLastPage ? "none" : "block";
+    document.getElementById('submit-btn-bottom').style.display = isLastPage ? "block" : "none";
+
+    document.querySelectorAll('.nav-grid .nav-box').forEach(el => el.classList.remove('current'));
+    for(let j = start; j < end; j++) {
+        const item = document.getElementById(`nav-item-${j}`);
+        if(item) item.classList.add('current');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function saveAnswer(index, value) {
+    userAnswers[index] = value;
+    document.getElementById(`nav-item-${index}`).classList.add('answered');
+  }
+
+  function changePage(step) { currentPage += step; renderPage(); }
+  function goToQuestion(index) { currentPage = Math.floor(index / questionsPerPage); renderPage(); }
+
+  function startTimer(minutes) {
+    timeLeft = minutes * 60;
+    if(timerId) clearInterval(timerId);
+    timerId = setInterval(() => {
+      timeLeft--;
+      let min = Math.floor(timeLeft / 60);
+      let sec = timeLeft % 60;
+      document.getElementById('timer').innerHTML = `${min}:${sec < 10 ? '0'+sec : sec}`;
+      if (timeLeft <= 0) { clearInterval(timerId); checkAnswers(); }
+    }, 1000);
+  }
+
+  function checkAnswers() {
+    if(timerId) clearInterval(timerId);
+    
+    document.getElementById('side-nav').style.display = "none";
+    document.getElementById('submit-btn-bottom').style.display = "none";
+    document.getElementById('pagination-controls').style.display = "none";
+    document.getElementById('after-submit-controls').style.display = "block";
+
+    let score = 0;
+    allQuestions.forEach((q, i) => { if (userAnswers[i] === q[5]) score++; });
+
+    let percent = Math.round((score / allQuestions.length) * 100);
+    const resDiv = document.getElementById('result');
+    resDiv.style.display = "block";
+    resDiv.className = `alert ${percent >= 70 ? 'alert-success' : 'alert-danger'} text-center py-4`;
+    resDiv.innerHTML = `<h2 class="display-4 fw-bold">${percent}%</h2><div class="h4 fw-bold">${percent >= 70 ? 'ĐẠT' : 'KHÔNG ĐẠT'}</div><div>Đúng ${score}/${allQuestions.length} câu</div>`;
+
+    showReviewList(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showReviewList(showAll) {
+    let html = `<h4 class="fw-bold mb-4 text-primary">${showAll ? 'XEM LẠI TOÀN BỘ CÂU HỎI' : 'DANH SÁCH CÂU SAI & ĐÁP ÁN'}</h4>`;
+    let hasWrong = false;
+
+    allQuestions.forEach((q, i) => {
+      let correctAns = q[5];
+      let userAns = userAnswers[i];
+      let isCorrect = userAns === correctAns;
+      if (!showAll && isCorrect) return; 
+      hasWrong = true;
+      let options = [q[1], q[2], q[3], q[4]].filter(o => o && o !== "");
+      html += `<div class="question-block">
+                <div class="question-title">${i + 1}. ${q[0]} ${isCorrect ? '<span class="text-success">✔</span>' : '<span class="text-danger">✘</span>'}</div>`;
+      options.forEach(opt => {
+        let styleClass = (opt === correctAns) ? "option-correct" : (opt === userAns && !isCorrect ? "option-wrong" : "");
+        html += `<div class="form-check"><label class="form-check-label ${styleClass}" style="padding-left:15px; margin-left:0;">${opt}</label></div>`;
+      });
+      html += `</div>`;
+    });
+
+    if (!showAll && !hasWrong) html = "<div class='text-center p-5 text-success'>🎉 Tuyệt vời! Bạn không sai câu nào!</div>";
+    document.getElementById('quiz-content').innerHTML = html;
+  }
+
+  function reviewAllQuestions() {
+    showReviewList(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function restartQuiz() { location.reload(); }
+</script>
+</body>
+</html>
