@@ -19,12 +19,13 @@
 
     /* 2. Thanh Menu màu xanh */
     .navbar {
-      background-color: #0000FF; /* Màu xanh chuẩn như hình */
+      background-color: #0000FF; /* Màu xanh chuẩn */
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 0;
       height: 60px;
+      flex-shrink: 0;
     }
 
     .navbar ul {
@@ -54,6 +55,7 @@
       font-size: 14px;
       letter-spacing: 0.5px;
       padding: 0 5px;
+      pointer-events: none; /* Để sự kiện click tập trung vào thẻ li */
     }
 
     /* 3. Thanh gạch chân màu trắng (Active State) */
@@ -89,28 +91,42 @@
   <!-- Thanh Menu điều hướng -->
   <div class="navbar">
     <ul>
-      <li class="active"><a href="#">Trang chủ</a></li>
-      <li><a href="#">Học - Trắc nghiệm</a></li>
-      <li><a href="#">Vấn đáp</a></li>
-      <li><a href="#">Test - Trắc nghiệm</a></li>
+      <!-- Dán các link tương ứng vào thuộc tính data-link -->
+      <li class="active" data-link="https://script.google.com/macros/s/AKfycbx2FWl8RrNtLZn1jhmSZBBwX8h1NuggACniYwZEibBZBxZGnk3XhuadpbPeG5Gn44hQ/exec">
+        <a href="#">Trang chủ</a>
+      </li>
+      <li data-link="https://chien83.github.io/hoctracnghiema0/">
+        <a href="#">Học - Trắc nghiệm</a>
+      </li>
+      <li data-link="https://sites.google.com/view/tracnghiema0/v%E1%BA%A5n-%C4%91%C3%A1p">
+        <a href="#">Vấn đáp</a>
+      </li>
+      <li data-link="https://script.google.com/macros/s/AKfycbyss3IaXbrbqw1yUD-_VRF77YgidAQJ31UPYmDcyULZQg-9ro8vZh3i3X-vsesn1T9A/exec">
+        <a href="#">Test - Trắc nghiệm</a>
+      </li>
     </ul>
   </div>
 
-  <!-- Vùng hiển thị nội dung Google Script -->
+  <!-- Vùng hiển thị nội dung -->
   <div class="content-container">
-    <iframe src="https://script.google.com/macros/s/AKfycbx2FWl8RrNtLZn1jhmSZBBwX8h1NuggACniYwZEibBZBxZGnk3XhuadpbPeG5Gn44hQ/exec"></iframe>
+    <iframe id="main-iframe" src="https://script.google.com/macros/s/AKfycbx2FWl8RrNtLZn1jhmSZBBwX8h1NuggACniYwZEibBZBxZGnk3XhuadpbPeG5Gn44hQ/exec"></iframe>
   </div>
 
   <script>
-    // Script để chuyển đổi trạng thái gạch chân khi nhấn menu
     const menuItems = document.querySelectorAll('.navbar li');
+    const iframe = document.getElementById('main-iframe');
+
     menuItems.forEach(item => {
       item.addEventListener('click', function() {
+        // 1. Chuyển đổi trạng thái gạch chân trắng
         menuItems.forEach(i => i.classList.remove('active'));
         this.classList.add('active');
         
-        // Tại đây bạn có thể thêm code để đổi link Iframe nếu muốn
-        // ví dụ: document.querySelector('iframe').src = "link_khac";
+        // 2. Lấy link từ thuộc tính data-link và thay đổi src của iframe
+        const newLink = this.getAttribute('data-link');
+        if (newLink) {
+            iframe.src = newLink;
+        }
       });
     });
   </script>
