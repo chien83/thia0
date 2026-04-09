@@ -2,86 +2,19 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hệ Thống Luyện Thi A0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Luyện Trắc Nghiệm A0 (Bảo mật)</title>
   <style>
-    body, html {
-      margin: 0; padding: 0; height: 100%; width: 100%;
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      display: flex; flex-direction: column; overflow: hidden;
+    body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background-color: #f0faff; }
+    iframe {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      border: none;
     }
-
-    /* Thanh Menu màu xanh */
-    .navbar {
-      background-color: #0000FF;
-      display: flex; justify-content: center; align-items: center;
-      height: 60px; flex-shrink: 0;
-    }
-
-    .navbar ul {
-      list-style: none; display: flex; margin: 0; padding: 0; height: 100%;
-    }
-
-    .navbar li {
-      margin: 0 10px; display: flex; align-items: center;
-      height: 100%; cursor: pointer; position: relative;
-    }
-
-    .navbar a {
-      color: white; text-decoration: none; font-weight: bold;
-      text-transform: uppercase; font-size: 13px; padding: 0 10px;
-      white-space: nowrap;
-    }
-
-    /* Hiệu ứng gạch chân trắng */
-    .navbar li.active::after {
-      content: ""; position: absolute; bottom: 0; left: 0;
-      width: 100%; height: 6px; background-color: white;
-    }
-
-    .content-container { flex: 1; width: 100%; border: none; }
-    iframe { width: 100%; height: 100%; border: none; }
   </style>
 </head>
 <body>
-
-  <div class="navbar">
-    <ul>
-      <li class="menu-item active" data-link="https://script.google.com/macros/s/AKfycbx2FWl8RrNtLZn1jhmSZBBwX8h1NuggACniYwZEibBZBxZGnk3XhuadpbPeG5Gn44hQ/exec">
-        <a href="javascript:void(0)">Trang chủ</a>
-      </li>
-      <li class="menu-item" data-link="https://script.google.com/macros/s/AKfycbyZp7x7B2chr6GQA8t0Kt_BeBaRbOG4tchgzNmEwZalFjAkMM39b7bz-DM6NG6cRIT0Jw/exec">
-        <a href="javascript:void(0)">Học - Trắc nghiệm</a>
-      </li>
-      <li class="menu-item" data-link="https://sites.google.com/view/tracnghiema0/v%E1%BA%A5n-%C4%91%C3%A1p?authuser=0">
-        <a href="javascript:void(0)">Vấn đáp</a>
-      </li>
-      <li class="menu-item" data-link="https://script.google.com/macros/s/AKfycbyss3IaXbrbqw1yUD-_VRF77YgidAQJ31UPYmDcyULZQg-9ro8vZh3i3X-vsesn1T9A/exec">
-        <a href="javascript:void(0)">Test - Trắc nghiệm</a>
-      </li>
-    </ul>
-  </div>
-
-  <div class="content-container">
-    <iframe id="main-frame" src="https://sites.google.com/view/trang-chu-cua-ban"></iframe>
-  </div>
-
-  <script>
-    const menuItems = document.querySelectorAll('.menu-item');
-    const mainFrame = document.getElementById('main-frame');
-
-    menuItems.forEach(item => {
-      item.addEventListener('click', function() {
-        // 1. Cập nhật trạng thái gạch chân
-        menuItems.forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-        
-        // 2. Thay đổi nội dung Iframe tương ứng với link trong data-link
-        const newLink = this.getAttribute('data-link');
-        mainFrame.src = newLink;
-      });
-    });
-  </script>
-
+  <!-- Dán Link Web App (exec) của bạn vào đây -->
+  <iframe src="https://script.google.com/macros/s/AKfycbx2FWl8RrNtLZn1jhmSZBBwX8h1NuggACniYwZEibBZBxZGnk3XhuadpbPeG5Gn44hQ/exec"></iframe>
 </body>
 </html>
