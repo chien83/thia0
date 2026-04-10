@@ -2,134 +2,19 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hệ Thống Luyện Thi A0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Luyện Trắc Nghiệm A0 (Bảo mật)</title>
   <style>
-    /* 1. Cấu hình chung cho toàn trang */
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* 2. Thanh Menu màu xanh */
-    .navbar {
-      background-color: #0000FF; /* Màu xanh chuẩn */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0;
-      height: 60px;
-      flex-shrink: 0;
-    }
-
-    .navbar ul {
-      list-style: none;
-      display: flex;
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
-
-    .navbar li {
-      margin: 0 15px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .navbar a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      text-transform: uppercase;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-      padding: 0 5px;
-      pointer-events: none; /* Để sự kiện click tập trung vào thẻ li */
-    }
-
-    /* 3. Thanh gạch chân màu trắng (Active State) */
-    .navbar li.active::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 6px; /* Độ dày thanh gạch chân */
-      background-color: white;
-    }
-
-    .navbar li:hover a {
-      opacity: 0.8;
-    }
-
-    /* 4. Khung chứa nội dung (Iframe) */
-    .content-container {
-      flex: 1; /* Tự động chiếm hết phần còn lại của màn hình */
-      width: 100%;
-      border: none;
-    }
-
+    body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background-color: #f0faff; }
     iframe {
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
       border: none;
     }
   </style>
 </head>
 <body>
-
-  <!-- Thanh Menu điều hướng -->
-  <div class="navbar">
-    <ul>
-      <!-- Dán các link tương ứng vào thuộc tính data-link -->
-      <li class="active" data-link="https://script.google.com/macros/s/AKfycbx2FWl8RrNtLZn1jhmSZBBwX8h1NuggACniYwZEibBZBxZGnk3XhuadpbPeG5Gn44hQ/exec">
-        <a href="#">Trang chủ</a>
-      </li>
-      <li data-link="https://chien83.github.io/hoctracnghiema0/">
-        <a href="#">Học - Trắc nghiệm</a>
-      </li>
-      <li data-link="https://sites.google.com/view/tracnghiema0/v%E1%BA%A5n-%C4%91%C3%A1p">
-        <a href="#">Vấn đáp</a>
-      </li>
-      <li data-link="https://script.google.com/macros/s/AKfycbyss3IaXbrbqw1yUD-_VRF77YgidAQJ31UPYmDcyULZQg-9ro8vZh3i3X-vsesn1T9A/exec">
-        <a href="#">Test - Trắc nghiệm</a>
-      </li>
-    </ul>
-  </div>
-
-  <!-- Vùng hiển thị nội dung -->
-  <div class="content-container">
-    <iframe id="main-iframe" src="https://script.google.com/macros/s/AKfycbx2FWl8RrNtLZn1jhmSZBBwX8h1NuggACniYwZEibBZBxZGnk3XhuadpbPeG5Gn44hQ/exec"></iframe>
-  </div>
-
-  <script>
-    const menuItems = document.querySelectorAll('.navbar li');
-    const iframe = document.getElementById('main-iframe');
-
-    menuItems.forEach(item => {
-      item.addEventListener('click', function() {
-        // 1. Chuyển đổi trạng thái gạch chân trắng
-        menuItems.forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-        
-        // 2. Lấy link từ thuộc tính data-link và thay đổi src của iframe
-        const newLink = this.getAttribute('data-link');
-        if (newLink) {
-            iframe.src = newLink;
-        }
-      });
-    });
-  </script>
-
+  <!-- Dán Link Web App (exec) của bạn vào đây -->
+  <iframe src="https://script.google.com/macros/s/AKfycbx2FWl8RrNtLZn1jhmSZBBwX8h1NuggACniYwZEibBZBxZGnk3XhuadpbPeG5Gn44hQ/exec"></iframe>
 </body>
 </html>
